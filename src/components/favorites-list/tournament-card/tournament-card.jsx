@@ -11,7 +11,8 @@ import { IMAGE_API_ROOT } from '../../../constants/constants';
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 345,
+    maxWidth: 500,
+    margin: 5
   },
 });
 
@@ -23,10 +24,10 @@ export default function TournamentCard({data, deleteFavorite}) {
       <CardActionArea>
         <CardMedia
           component="img"
-          alt="Contemplative Reptile"
+          alt={data.title}
           height="140"
           image={IMAGE_API_ROOT + data.images.banner.filePath}
-          title="Contemplative Reptile"
+          title={data.title}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">

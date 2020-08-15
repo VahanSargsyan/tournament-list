@@ -1,0 +1,9 @@
+.container {
+  max-width: 1020px;
+}
+
+@media only screen and (max-width: 1060px) {
+  .container {
+    max-width: 510px;
+  }
+}

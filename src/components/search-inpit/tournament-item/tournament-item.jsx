@@ -3,11 +3,14 @@ import React from "react";
 import styles from "./tournament-item.module.css";
 import { IMAGE_API_ROOT, DEFAULT_IMAGE_URL } from "../../../constants/constants";
 
-export default function Tournament({data, onClick}) {
+export default function Tournament({data, onClick, resetTournaments}) {
   const {  images, title, description, id, } = data;
   return (
     <div
-      onClick={() => onClick({ images: { banner: images?.banner }, title, description, id })}
+      onClick={() => {
+        onClick({ images: { banner: images?.banner }, title, description, id });
+        resetTournaments();
+      }}
       className={styles.container}
     >
       <img
@@ -19,6 +22,7 @@ export default function Tournament({data, onClick}) {
         <h3>{title}</h3>
         <span>{description}</span>
       </div>
+
     </div>
   );
 }

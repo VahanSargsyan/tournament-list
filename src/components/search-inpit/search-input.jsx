@@ -14,6 +14,8 @@ import {
   catchError,
 } from "rxjs/operators";
 
+import styles from "./search-input.module.css";
+
 export default function SearchInput({ addFavorite }) {
   const [tournaments, setTournaments] = useState([]);
   const [query, setQuery] = useState("");
@@ -22,7 +24,6 @@ export default function SearchInput({ addFavorite }) {
 
   queryChangeSubject
     .pipe(
-      tap((query) => console.log(query)),
       debounceTime(300),
       distinctUntilChanged(),
       tap((query) => setQuery(query)),
@@ -33,28 +34,40 @@ export default function SearchInput({ addFavorite }) {
         )
       ),
       tap(([data]) => setTournaments(data ? data.documents : []))
-
     )
-    .subscribe((val) => console.log(val));
+    .subscribe();
+
+  const resetTournaments = () => {
+    setTournaments([]);
+    setQuery("");
+  };
 
   return (
-    <Autocomplete
-      options={tournaments}
-      getOptionLabel={(option) => {
-        return option.title ? option.title : option.toString();
-      }}
-      renderOption={(option) => {
-        return <Tournament onClick={addFavorite} data={option}></Tournament>;
-      }}
-      value={query}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          onInput={(e) => queryChangeSubject.next(e?.target?.value)}
-          label="Search Input"
-          variant="outlined"
-        />
-      )}
-    />
+    <div className={styles.container}>
+      <Autocomplete
+        options={tournaments}
+        getOptionLabel={(option) => {
+          return option.title ? option.title : option.toString();
+        }}
+        renderOption={(option) => {
+          return (
+            <Tournament
+              resetTournaments={resetTournaments}
+              onClick={addFavorite}
+              data={option}
+            ></Tournament>
+          );
+        }}
+        value={query}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            onInput={(e) => queryChangeSubject.next(e?.target?.value)}
+            label="Search Input"
+            variant="outlined"
+          />
+        )}
+      />
+    </div>
   );
 }

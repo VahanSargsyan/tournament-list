@@ -11,7 +11,9 @@ export default function favorites(state = initialState, action) {
   switch (action.type) {
     case ADD_FAVORITE:
       addFavoriteToStore(action.payload);
-      return [...state, action.payload];
+      return state.find((favorite) => favorite.id === action.payload.id)
+        ? state
+        : [...state, action.payload];
     case DELETE_FAVORITE:
       deleteFavoriteFromStore(action.payload.id);
       return state.filter((favorite) => favorite.id !== action.payload.id);
