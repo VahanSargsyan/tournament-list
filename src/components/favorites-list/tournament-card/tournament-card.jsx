@@ -18,7 +18,6 @@ const useStyles = makeStyles({
 export default function TournamentCard({data, deleteFavorite}) {
   const classes = useStyles();
 
-  console.log(data);
   return (
     <Card className={classes.root}>
       <CardActionArea>

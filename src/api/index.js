@@ -1,9 +1,13 @@
 import { of } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
-import { map, switchMap, catchError } from "rxjs/operators";
+import { switchMap, catchError } from "rxjs/operators";
+import {
+  TOURNAMENT_SEARCH_ROOT,
+  TOURNAMENT_SEARCH_APENDIX,
+} from "../constants/constants";
 
 const getTournamentURL = (query) =>
-  `https://api-search.win.gg/search?q=${query}&index=tournament`;
+  `${TOURNAMENT_SEARCH_ROOT}${query}${TOURNAMENT_SEARCH_APENDIX}`;
 
 export function getTournamentsByQuery(query) {
   return fromFetch(getTournamentURL(query)).pipe(
@@ -14,12 +18,7 @@ export function getTournamentsByQuery(query) {
         return of({ error: true, message: `Error ${response.status}` });
       }
     }),
-    // map(({ id, images, title, descriptions }) => ({
-    //   id,
-    //   images,
-    //   title,
-    //   descriptions,
-    // })),
+
     catchError((err) => {
       console.error(err);
       return of({ error: true, message: err.message });

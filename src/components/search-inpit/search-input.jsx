@@ -1,44 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { Tournament } from "../../components";
+import { Subject, EMPTY } from "rxjs";
 
 import { getTournamentsByQuery } from "../../api";
-import { from } from "rxjs";
+import {
+  tap,
+  debounceTime,
+  filter,
+  switchMap,
+  distinctUntilChanged,
+  catchError,
+} from "rxjs/operators";
 
 export default function SearchInput({ addFavorite }) {
   const [tournaments, setTournaments] = useState([]);
   const [query, setQuery] = useState("");
 
-  const testTrnmnt = {
-    city: "Sao Paulo",
-    country_name: "Brazil",
-    description:
-      "Riot game's International Wildcard Qualifier is bacL studios in Sao Paulo, Brazil.",
-    end: "2016-09-05T00:00:00.000Z",
-    game_id: "2",
-    id: "MTU5Nw",
-    short_title: "IWCQ",
-    slug: "iwcq",
-    source: "abios",
-    title: "2016 International Wildcard Qualifier",
-  };
+  const queryChangeSubject = new Subject();
 
+  queryChangeSubject
+    .pipe(
+      tap((query) => console.log(query)),
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap((query) => setQuery(query)),
+      filter((query) => query.length > 2),
+      switchMap((query) =>
+        getTournamentsByQuery(query).pipe(
+          catchError((error) => console.error(error) || EMPTY)
+        )
+      ),
+      tap(([data]) => setTournaments(data ? data.documents : []))
 
-
-  const handelQueryOnChange = (event) => {
-    console.log(event);
-    if (event) {
-      setQuery(event.target.value);
-      if (event.target?.value?.length > 2) {
-        getTournamentsByQuery(query).subscribe(([data]) => {
-          if (data) {
-            setTournaments(data.documents);
-          }
-        });
-      }
-    }
-  };
+    )
+    .subscribe((val) => console.log(val));
 
   return (
     <Autocomplete
@@ -47,20 +44,13 @@ export default function SearchInput({ addFavorite }) {
         return option.title ? option.title : option.toString();
       }}
       renderOption={(option) => {
-        return (
-          <Tournament
-            onClick={addFavorite}
-            data={option}
-          ></Tournament>
-        );
+        return <Tournament onClick={addFavorite} data={option}></Tournament>;
       }}
-      // getOptionSelected={(e) => console.log("selected tornament", { e })}
       value={query}
-      onChange={(e) => handelQueryOnChange(e)}
       renderInput={(params) => (
         <TextField
           {...params}
-          onInput={(e) => handelQueryOnChange(e)}
+          onInput={(e) => queryChangeSubject.next(e?.target?.value)}
           label="Search Input"
           variant="outlined"
         />

@@ -8,10 +8,7 @@ import { Provider } from "react-redux";
 import "./index.css";
 import App from "./App";
 
-const store = createStore(
-  reducer,
-  window.__REDUX_DEVTOOLS_EXTENSION_ && window.__REDUX_DEVTOOLS_EXTENSION_()
-);
+const store = createStore(reducer);
 
 ReactDOM.render(
   <React.StrictMode>
